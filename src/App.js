@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import MovieList from "./components/MovieList";
@@ -14,7 +14,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movies/:type" element={<MovieList />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
-          <Route path="/*" element={<Error />} />
+          <Route path="*" element={<Error />} />
         </Routes>
       </Router>
     </div>

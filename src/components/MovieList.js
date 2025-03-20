@@ -1,28 +1,58 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./MovieList.css"; // Add styles here
 
-const MovieList = ({ type }) => {
+const MovieList = () => {
   const [movies, setMovies] = useState([]);
-  const params = useParams();
-  const movieType = params.type || type || 'popular';
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_TMDB_API_KEY); 
-    axios.get(`https://api.themoviedb.org/3/movie/${movieType}?api_key=${process.env.REACT_APP_TMDB_API_KEY}`)
-      .then(res => setMovies(res.data.results))
-      .catch(err => {
-        console.error('Error fetching movies:', err);
-      });
-  }, [movieType]);
+    const fetchPopular = async () => {
+      try {
+        const res = await axios.get(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.REACT_APP_TMDB_API_KEY}`
+        );
+        setMovies(res.data.results);
+      } catch (err) {
+        console.error("Error fetching movies:", err);
+      }
+    };
 
+    fetchPopular();
+  }, []);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+
+    useEffect(() => {
+    const fetchGenres = async () => {
+        const res = await axios.get(
+        `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.REACT_APP_TMDB_API_KEY}`
+        );
+        setGenres(res.data.genres);
+    };
+    fetchGenres();
+    }, []);
+
+    const handleGenreChange = async (e) => {
+    const genreId = e.target.value;
+    setSelectedGenre(genreId);
+
+    const res = await axios.get(
+        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API_KEY}&with_genres=${genreId}`
+    );
+    setMovies(res.data.results);
+    };
+    
   return (
-    <div className="movieList">
-      {movies.map(movie => (
-        <Link key={movie.id} to={`/movie/${movie.id}`} className="movieCard">
-          <img src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`} alt={movie.title} />
-          <p>{movie.title}</p>
-        </Link>
+    
+    <div className="movieGrid">
+      {movies.map((movie) => (
+        <div className="movieCard" key={movie.id}>
+          <img
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+          />
+          <h3>{movie.title}</h3>
+        </div>
       ))}
     </div>
   );
